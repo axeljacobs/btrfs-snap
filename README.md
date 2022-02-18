@@ -55,6 +55,7 @@ OS Support
 
 Tested on
 
+* Ubuntu 16.04
 * Ubuntu 20.04
 
 Anything else, YMMV.  Reports of successful use on other operating systems
