@@ -8,6 +8,7 @@
 # Copyright (C) 2015 Lukas Pirl btrfs-snap@lukas-pirl.de
 # Copyright (C) 2015-2017 Michael Walz btrfs-snap@serpedon.de
 # Copyright (C) 2017 Raimund Jacob-Bloedorn jacob@pinuts.de
+# 2022 Axel Jacobs a.jacobs@nexxit.be
 
 # This program is distributed under the GNU General Public License
 # http://www.gnu.org/licenses/gpl.txt
@@ -16,7 +17,7 @@
 set -u
 
 LOG_FACILITY=local0
-VERSION="1.7.3"
+VERSION="1.7.3.1"
 prog=${0##*/}
 PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
 
@@ -193,7 +194,7 @@ function log.error() {
 
 # Verify that the path is either a valid btrfs mountpoint
 
-if ! mount -t btrfs | cut -d " " -f 3 | grep "^${mp}$" > /dev/null ; then
+if ! findmnt -t btrfs -T "${mp}" &> /dev/null; then
     # or a valid snapshot matching mp
     # Get the path of the root volume as a prefix
     rv=$(mount -t btrfs | cut -d " " -f 3)

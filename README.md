@@ -55,22 +55,13 @@ OS Support
 
 Tested on
 
-* Ubuntu 12.04 with the raring kernel
-* Ubuntu 13.04
-* Debian 8
-* Debian 9
+* Ubuntu 20.04
 
 Anything else, YMMV.  Reports of successful use on other operating systems
 is welcome
 
 To snaphshot an unmounted btrfs subvolume, you need a version of btrfs-progs
 that supports the "btrfs subvolume show" command.
-
-The version that comes with Ubuntu 13.04 is too old; the version that comes
-with Ubuntu 13.10 works.  You should be able to compile a working version
-from the sources (refer to
-https://btrfs.wiki.kernel.org/index.php/Btrfs_source_repositories for
-details).
 
 License
 -------
