@@ -35,8 +35,8 @@ SYNOPSIS="${prog} [options] <mountpoint> <prefix> <count>
 btrfs-snap / hourly 24
 would make a snapshot in /.snapshot called hourly_<date>_<time>
 where <date> is on the form YYYY-MM-DD and <time> is on the form
-HH:MM:SS. This format makes shure snapshot names sort correctly in
-cronological order even when sorted alphabetically. The 24 newest
+HH:MM:SS. This format makes sure snapshot names sort correctly in
+chronological order even when sorted alphabetically. The 24 newest
 snapshots matching the prefix are kept around. The rest are deleted.
 
 if '-r' is given, snapshots are created read only
@@ -45,7 +45,7 @@ if '-c' is given, snapshots are created with more compatible names
 (i.e. no colons in file names, so that SAMBA does not mangle the names)
 
 if '-p' is given, the <prefix> will be used as a postfix, i.e. it is
-appended which might be usefull for automatic chronological sorting.
+appended which might be usefully for automatic chronological sorting.
 
 if '-E' is given, omitting a snapshot (e.g. due to options -t/-T) is
 treated as an error and a non-zero exit code is returned.
@@ -68,7 +68,7 @@ be made if <mountpoint> has identical timestamp as the newest snapshot.
 (conflicts with -T)
 
 if '-T time' is given, a snapshot will only be created if the newest already
-existing snapshot is older than 'time' seconds. Additonally, no snapshot will
+existing snapshot is older than 'time' seconds. Additionally, no snapshot will
 be made if <mountpoint> has a lower or equal transition-id than newest snapshot.
 (conflicts with -t)
 
@@ -96,7 +96,7 @@ ${0} /home weekly 4
 
 
 Alternative (more complicated) example for a system with 1 btrfs subvolume called /data.
-These three commands should be run regularily (e.g. all 5 minutes) and
+These three commands should be run regularly (e.g. all 5 minutes) and
 test themselves if a snapshot is needed:
 ${0} -r -c -B <SNAPSHOT_PATH> -t   3600 /data data_hourly 24
 ${0} -r -c -B <SNAPSHOT_PATH> -t  86400 /data data_daily 7
@@ -133,10 +133,10 @@ while getopts "hVrqpEb:d:B:ct:T:" arg; do
             OMITT_ERROR_CODE=1
             ;;
         t )
-            time_duration=$((0+$OPTARG))
+            time_duration=$((0+OPTARG))
             ;;
         T )
-            time_duration=$((0+$OPTARG))
+            time_duration=$((0+OPTARG))
             use_transid=true
             ;;
         b )
@@ -181,22 +181,26 @@ prefix=$2
 cnt=$(( $3+1 ))
 
 function log.info() {
-    logger -p ${LOG_FACILITY}.info -t ${prog} "$1"
+    logger -p ${LOG_FACILITY}.info -t "${prog}" "$1"
     test -z "$quiet" && echo "$1"
 }
 
 function log.error() {
-    logger -p ${LOG_FACILITY}.err -t ${prog} "$1"
+    logger -p ${LOG_FACILITY}.err -t "${prog}" "$1"
     echo "ERROR: $1" >&2
     exit 1;
 }
 
 # Verify that the path is either a valid btrfs mountpoint
-mount -t btrfs | cut -d " " -f 3 | grep "^${mp}$" > /dev/null
-if [ $? -ne 0 ] ; then
+
+if ! mount -t btrfs | cut -d " " -f 3 | grep "^${mp}$" > /dev/null ; then
     # or a valid snapshot matching mp
-    btrfs subvolume show $mp | grep "${mp}$" > /dev/null
-    if [ $? -ne 0 ] ; then
+    # Get the path of the root volume as a prefix
+    rv=$(mount -t btrfs | cut -d " " -f 3)
+    # Remove the prefix with the / from the full path
+    vn=${mp#"$rv/"}
+
+    if ! btrfs subvolume show "$mp" | grep "$vn" > /dev/null ; then
         log.error "${mp} is not a btrfs mountpoint (or old version of btrfs-tools, try > 0.19)"
         exit 1;
     fi
@@ -217,13 +221,13 @@ fi
 if [ "x$full_base" != "x" ]; then
     base=$full_base
 fi
-if [ ! -d $base ]; then
+if [ ! -d "$base" ]; then
     log.info "Creating $base"
-    mkdir -p $base
+    mkdir -p "$base"
 fi
-base=$(readlink -f $base)
+base=$(readlink -f "$base")
 
-if [ ${prefix} == VFS ]; then
+if [ "${prefix}" == VFS ]; then
     snapname=$(TZ=GMT date +@GMT-%Y.%m.%d-%H.%M.%S)
     snappattern="@GMT-????.??.??-??.??.??"
 else
@@ -235,33 +239,33 @@ else
         snappattern="????-??-??_??${time_delim}??${time_delim}??_${prefix}"
     fi
 fi
-if [ -e ${base}/${snapname} ]; then
+if [ -e "${base}"/"${snapname}" ]; then
     log.error "cannot create snapshot in ${base}/${snapname} since a folder/file with that name already exists"
     exit 1;
 fi
 
 if [ $time_duration -gt 0 ]; then
-    newestSnapshot=`ls -dr $base/${snappattern} 2>/dev/null| head -n 1`
+    newestSnapshot=$(ls -dr "$base"/"${snappattern}" 2>/dev/null| head -n 1)
     if [ ! -z "$newestSnapshot" -a -e "$newestSnapshot" ]; then
-        snap_time=`stat -c "%Y" "${newestSnapshot}"`
-        cur_time=`date +%s`
+        snap_time=$(stat -c "%Y" "${newestSnapshot}")
+        cur_time=$(date +%s)
         if $use_transid; then
             # get transaction ids
             id_snap=$(btrfs subvolume find-new "$newestSnapshot" 99999999| sed 's/[^0-9]//g')
             id_mount=$(btrfs subvolume find-new "${mp}" 99999999| sed 's/[^0-9]//g')
-            if [ $id_mount -le $id_snap ]; then
+            if [ "$id_mount" -le "$id_snap" ]; then
                 log.info "No snapshot created since no changes since last snapshot. (Transaction id of $newestSnapshot is newer or equal to $mp.)"
                 exit $OMITT_ERROR_CODE
             fi
         else
-            mp_time=`stat -c "%Y" "${mp}"`
-            if [ $snap_time == $mp_time ]; then
+            mp_time=$(stat -c "%Y" "${mp}")
+            if [ "$snap_time" == "$mp_time" ]; then
                 log.info "No snapshot created since timestamp of newest snapshot $newestSnapshot equal $mp."
                 exit $OMITT_ERROR_CODE
             fi
         fi
 
-        if [ $(($snap_time + $time_duration)) -gt $cur_time ]; then
+        if [ $(("$snap_time" + "$time_duration")) -gt "$cur_time" ]; then
             log.info "No snapshot created since timestamp of newest snapshot $newestSnapshot is less than $time_duration seconds away."
             exit $OMITT_ERROR_CODE
         fi
@@ -271,7 +275,7 @@ if [ $time_duration -gt 0 ]; then
      touch "${mp}"
 fi
 
-out=`btrfs subvol snapshot ${readonly} ${mp} ${base}/${snapname} 2>&1`
+out=$(btrfs subvol snapshot "${readonly}" "${mp}" "${base}"/"${snapname}" 2>&1)
 if [ $? -eq 0 ] ; then
     log.info "${out}"
 else
@@ -279,8 +283,8 @@ else
     exit 1;
 fi
 
-ls -dr $base/${snappattern} | tail -n +${cnt} | while read snap ; do
-    out=`btrfs subvolume delete ${snap} 2>&1`
+ls -dr $base/${snappattern} | tail -n +${cnt} | while read -r snap ; do
+    out=$(btrfs subvolume delete "${snap}" 2>&1)
     if [ $? -eq 0 ] ; then
         log.info "${out}"
     else
