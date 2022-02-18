@@ -5,7 +5,7 @@ btrfs-snap creates and maintains the history of snapshots of btrfs filesystems.
 
 Features:
 
-* can snapshot inside of the filesystem or rooted in a base directory
+* can snapshot inside the filesystem or rooted in a base directory
 * can purge old snapshots when too many exist
 * can keep multiple snapshot schedules for the same filesystem
 
@@ -21,7 +21,7 @@ btrfs-snap [-r] [-b basedir] mountpoint prefix count
 * count is the number of snapshots with the same prefix to keep
 * -r makes the snapshot readonly (requires btrfs-tools v0.20)
 * -c generates more compatible snapshot names
-     (ie. no colons that confuse SAMBA/Window$ clients)
+     (i.e. no colons that confuse SAMBA/Window$ clients)
 * -E treats omitting of snapshots as error
 * -p redefines the prefix to be used as postfix
 * -d dir places the snapshot in dir, relative to the mountpoint
@@ -82,7 +82,7 @@ VFS snapshot naming support by gitmopp (https://github.com/gitmopp)
 
 Support for snapshotting unmounted btrfs subvolumes by Brian Kloppenborg (https://github.com/bkloppenborg)
 
-Switches -c (for windows-combitible timestamps) and -d (for specifying the snapshot directory) by Lukas Pirl (btrfs-snap@lukas-pirl.de)
+Switches -c (for windows-compatible timestamps) and -d (for specifying the snapshot directory) by Lukas Pirl (btrfs-snap@lukas-pirl.de)
 
 Switches -B (absolute path of snapshot directory) and -t/-T (time-dependent snapshot) by Michael Walz (btrfs-snap@serpedon.de)
 
