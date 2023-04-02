@@ -1,4 +1,8 @@
 # btrfs-snap Changelog
+## v1.7.4 (Apr 02 2023)
+* Minor bugfix to work with btrfs-progs 5.10
+
+# btrfs-snap Changelog
 ## v1.7.3 (Jul 25 2017)
 * Removed perl dependency (replaced perl regex by bash regex)
 
