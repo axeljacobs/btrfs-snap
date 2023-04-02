@@ -59,6 +59,7 @@ Tested on
 * Ubuntu 13.04
 * Debian 8
 * Debian 9
+* Debian 11 (bullseye)
 
 Anything else, YMMV.  Reports of successful use on other operating systems
 is welcome
