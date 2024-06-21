@@ -16,7 +16,7 @@
 set -u
 
 LOG_FACILITY=local0
-VERSION="1.7.3"
+VERSION="1.7.4"
 prog=${0##*/}
 PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
 
@@ -199,7 +199,7 @@ if ! findmnt -t btrfs -T "${mp}" &> /dev/null; then
     # or a valid snapshot matching mp
     btrfs subvolume show $mp > /dev/null
     if [ $? -ne 0 ] ; then
-        log.error "${mp} is not a btrfs mountpoint (or old version of btrfs-tools, try > 0.19)"
+        log.error "${mp} is not a btrfs mountpoint (or old version of btrfs-progs, try >=5.10)"
         exit 1;
     fi
 fi
